@@ -22,11 +22,12 @@
    node {skillBaseDir}/scripts/check_chapter_wordcount.mjs --all <项目文件夹路径> --json
    ```
    退出码：0=全部达标，1=有不达标，2=错误。从 `--json` 输出的 `results[]` 读取各章 `word_count` 与 `status`
-3. **更新 JSON**：将 `wordCount` 和 `wordCountPass` 写入对应章节记录
+3. **正式摘要**：逐章确认 `99-章节摘要.md` 有对应章号的实际摘要内容；空标题、注释、占位不算摘要。临时批次摘要先按并行写入协议汇总，缺失或冲突时回查正文补齐，只补摘要缺项时不重写正文。
+4. **更新 JSON**：将 `wordCount` 和 `wordCountPass` 写入对应章节记录；正文检查通过且正式摘要已保存，才将该章设 completed
 
 ### 3. 汇总结果
 
-- **全部通过**（所有章节文件存在且 `wordCountPass == true`）→ 更新项目 `status` 为 `"completed"`，进入步骤5
+- **全部通过**（所有章节文件存在、`wordCountPass == true` 且正式摘要齐全）→ 更新项目 `status` 为 `"completed"`，进入步骤5
 - **有不通过** → 进入步骤4
 
 ### 4. 自动修复（最多3轮）
@@ -41,7 +42,7 @@
 循环规则：
 - 最多执行 **3轮** 校验-修复循环
 - 超过3次仍不合格的章节，保留记录但不阻塞流程
-- 所有修复完成后更新项目 `status` 为 `"completed"`
+- 只有全部检查通过才将项目设 completed；三轮后仍有未解决项时保留 validating，报告缺项与失败章，不宣称完稿
 
 ### 5. 完成报告
 
